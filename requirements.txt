@@ -1,4 +1,0 @@
-Flask 
-pymongo 
-dnspython
-gunicorn
