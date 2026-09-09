@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mongo App</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 60px 20px; }
+    .card { background: #1e293b; border-radius: 12px; padding: 36px; width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+    h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 28px; color: #38bdf8; }
+    input { width: 100%; padding: 12px 14px; margin-bottom: 14px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: #e2e8f0; font-size: 1rem; outline: none; transition: border .2s; }
+    input:focus { border-color: #38bdf8; }
+    button { width: 100%; padding: 12px; background: #38bdf8; color: #0f172a; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; transition: background .2s; }
+    button:hover { background: #7dd3fc; }
+    #msg { margin-top: 14px; font-size: .9rem; color: #4ade80; min-height: 22px; }
+    h2 { margin-top: 32px; margin-bottom: 12px; font-size: 1.1rem; color: #94a3b8; }
+    ul { list-style: none; }
+    li { padding: 10px 14px; background: #0f172a; border-radius: 8px; margin-bottom: 8px; font-size: .95rem; border-left: 3px solid #38bdf8; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>👤 User Registry</h1>
+    <input type="text"   id="name" placeholder="Full Name">
+    <input type="number" id="age"  placeholder="Age">
+    <button onclick="addUser()">Add to MongoDB</button>
+    <div id="msg"></div>
+
+    <h2>Stored Names</h2>
+    <ul id="name-list">
+      {% for name in names %}
+        <li>{{ name }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <script>
+    async function addUser() {
+      const name = document.getElementById("name").value.trim();
+      const age  = document.getElementById("age").value;
+      const msg  = document.getElementById("msg");
+
+      if (!name || !age) { msg.style.color = "#f87171"; msg.textContent = "Both fields required."; return; }
+
+      const res  = await fetch("/add", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({name, age}) });
+      const data = await res.json();
+
+      if (res.ok) {
+        msg.style.color = "#4ade80";
+        msg.textContent = data.message;
+        document.getElementById("name").value = "";
+        document.getElementById("age").value  = "";
+        const list = document.getElementById("name-list");
+        list.innerHTML = data.names.map(n => `<li>${n}</li>`).join("");
+      } else {
+        msg.style.color = "#f87171";
+        msg.textContent = data.error;
+      }
+    }
+  </script>
+</body>
+</html>

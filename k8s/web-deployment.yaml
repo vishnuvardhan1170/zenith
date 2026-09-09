@@ -1,0 +1,58 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: zenith
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      serviceAccountName: zenith
+      containers:
+        - name: web
+          image: vishnusai1/web:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          envFrom:
+            - configMapRef:
+                name: web-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: zenith
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+      nodePort: 30001
+  selector:
+    app: web
