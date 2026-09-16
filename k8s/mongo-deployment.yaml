@@ -23,7 +23,7 @@ spec:
     spec:
       serviceAccountName: zenith
       containers:
-        - image: mongo:8.0
+        - image: mongo:8.2
           name: flask-mongo
           ports:
             - containerPort: 27017
