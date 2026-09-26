@@ -11,7 +11,7 @@ services:
       - mongo
 
   mongo:
-    image: mongo:8.0
+    image: mongo:8.2
     container_name: flask-mongo
     restart: unless-stopped
     ports:
